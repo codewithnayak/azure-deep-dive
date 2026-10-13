@@ -44,3 +44,10 @@ jobs:
 
       - name: Run Unit Tests
         run: dotnet test create-fir-api.slnx --configuration Release --no-build
+
+      - name: Build FIR API Docker Image
+        run: |
+          docker build \
+            -t iels-fir-api:${{ github.sha }} \
+            -f FirApi/Dockerfile \
+            .
