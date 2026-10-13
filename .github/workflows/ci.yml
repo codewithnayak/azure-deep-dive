@@ -17,6 +17,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 jobs:
   build-and-test:
@@ -51,3 +52,27 @@ jobs:
             -t iels-fir-api:${{ github.sha }} \
             -f FirApi/Dockerfile \
             .
+      - name: Login to Azure
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Login to Azure Container Registry
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: az acr login --name "${{ vars.ACR_NAME }}"
+
+      - name: Tag Docker Image
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          docker tag \
+            iels-fir-api:${{ github.sha }} \
+            ${{ vars.ACR_NAME }}.azurecr.io/iels-fir-api:${{ github.sha }}
+
+      - name: Push Docker Image
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          docker push \
+            ${{ vars.ACR_NAME }}.azurecr.io/iels-fir-api:${{ github.sha }}
