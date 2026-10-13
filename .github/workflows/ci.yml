@@ -1,0 +1,46 @@
+name: IELS FIR API CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "create-fir-api/**"
+      - ".github/workflows/ci.yml"
+
+  pull_request:
+    branches: [main]
+    paths:
+      - "create-fir-api/**"
+      - ".github/workflows/ci.yml"
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    name: Build and Test FIR API
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./create-fir-api
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Restore Dependencies
+        run: dotnet restore create-fir-api.slnx
+
+      - name: Build FIR API
+        run: dotnet build create-fir-api.slnx --configuration Release --no-restore
+
+      - name: Run Unit Tests
+        run: dotnet test create-fir-api.slnx --configuration Release --no-build
