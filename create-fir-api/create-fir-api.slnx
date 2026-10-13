@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="FirApi/FirApi.csproj" />
+  <Project Path="FirTest/FirTest.csproj" />
 </Solution>
