@@ -20,7 +20,13 @@ builder.Services.AddScoped<IFirService, FirService>();
 // and issuer/audience validation here before deployment.
 builder.Services.AddAuthorization();
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 var app = builder.Build();
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
